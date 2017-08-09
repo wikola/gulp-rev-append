@@ -14,11 +14,12 @@ how?
 ---
 _gulpfile.js_
 ```
+var path = require('path');
 var rev = require('gulp-rev-append');
 
 gulp.task('rev', function() {
   gulp.src('./index.html')
-    .pipe(rev())
+    .pipe(rev({baseDir: path.join(__dirname, 'public')}))
     .pipe(gulp.dest('.'));
 });
 

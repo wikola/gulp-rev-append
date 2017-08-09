@@ -8,7 +8,12 @@ var map = require('event-stream').map;
 
 var FILE_DECL = /(?:href=|src=|url\()['|"]([^\s>"']+?)\?rev=([^\s>"']+?)['|"]/gi;
 
-var revPlugin = function revPlugin() {
+var revPlugin = function revPlugin(opts) {
+
+  opts = Object.assign({
+    baseDir: __dirname,
+    hashLength: 7
+  }, opts);
 
   return map(function(file, cb) {
 
@@ -18,7 +23,6 @@ var revPlugin = function revPlugin() {
     var line;
     var groups;
     var declarations;
-    var dependencyPath;
     var data, hash;
 
     if(!file) {
@@ -40,20 +44,12 @@ var revPlugin = function revPlugin() {
         for(var j = 0; j < declarations.length; j++) {
           groups = FILE_DECL.exec(declarations[j]);
           if(groups && groups.length > 1) {
-            // are we an "absoulte path"? (e.g. /js/app.js)
-            var normPath = path.normalize(groups[1]);
-            if (normPath.indexOf(path.sep) === 0) {
-              dependencyPath = path.join(file.base, normPath);
-            }
-            else {
-              dependencyPath = path.resolve(path.dirname(file.path), normPath);
-            }
-
+            var filename = path.join(opts.baseDir, path.normalize(groups[1]));
             try {
               data = fs.readFileSync(dependencyPath);
               hash = crypto.createHash('md5');
               hash.update(data.toString(), 'utf8');
-              line = line.replace(groups[2], hash.digest('hex'));
+              line = line.replace(groups[2], hash.digest('hex').substring(0, opts.hashLength));
             }
             catch(e) {
               // fail silently.
