@@ -46,7 +46,7 @@ var revPlugin = function revPlugin(opts) {
           if(groups && groups.length > 1) {
             var filename = path.join(opts.baseDir, path.normalize(groups[1]));
             try {
-              data = fs.readFileSync(dependencyPath);
+              data = fs.readFileSync(filename);
               hash = crypto.createHash('md5');
               hash.update(data.toString(), 'utf8');
               line = line.replace(groups[2], hash.digest('hex').substring(0, opts.hashLength));
