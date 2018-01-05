@@ -19,7 +19,12 @@ var rev = require('gulp-rev-append');
 
 gulp.task('rev', function() {
   gulp.src('./index.html')
-    .pipe(rev({baseDir: path.join(__dirname, 'public')}))
+    .pipe(rev({
+      baseDir: path.join(__dirname, 'public'),  
+      pathTransform: function (path) {
+        return path.replace('${param.theme}', 'cyan');
+      }
+    }))
     .pipe(gulp.dest('.'));
 });
 
@@ -29,6 +34,8 @@ _terminal_
 ```
 $ gulp rev
 ```
+
+`baseDir` and `pathTransform` are not requierd.
 
 what?
 ---
@@ -41,6 +48,7 @@ That's fancy talk for any stylesheet or script declarations that are declared in
 <html>
   <head>
     <link rel="stylesheet" type="text/css" href="style/style-one.css?rev=@@hash">
+    <link rel="stylesheet" type="text/css" href="style/themes/colors/${param.theme}/main.css?rev=@@hash"/>
     <script src="script/script-one.js?rev=@@hash"></script>
     <script src="script/script-two.js"></script>
   </head>
@@ -57,6 +65,7 @@ will turn into something similar as the following after running `gulp-rev-append
 <html>
   <head>
     <link rel="stylesheet" type="text/css" href="style/style-one.css?rev=d65aaba987e9c1eefeb4be9cfd34e0de">
+    <link rel="stylesheet" type="text/css" href="style/themes/colors/${param.theme}/main.css?rev=aee9bc5"/>
     <script src="script/script-one.js?rev=17a5da6c8a2d875cf48aefb722eefa07"></script>
     <script src="script/script-two.js"></script>
   </head>
@@ -100,6 +109,11 @@ Tests
 ```
 $ npm run test
 ```
+
+ToDO
+---
+Make test for `baseDir` and `pathTransform`
+
 
 License
 ---

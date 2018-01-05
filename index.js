@@ -12,6 +12,7 @@ var revPlugin = function revPlugin(opts) {
 
   opts = Object.assign({
     baseDir: __dirname,
+    pathTransform: function(o) { return o},
     hashLength: 7
   }, opts);
 
@@ -45,6 +46,7 @@ var revPlugin = function revPlugin(opts) {
           groups = FILE_DECL.exec(declarations[j]);
           if(groups && groups.length > 1) {
             var filename = path.join(opts.baseDir, path.normalize(groups[1]));
+            filename = opts.pathTransform(filename)
             try {
               data = fs.readFileSync(filename);
               hash = crypto.createHash('md5');
@@ -53,6 +55,8 @@ var revPlugin = function revPlugin(opts) {
             }
             catch(e) {
               // fail silently.
+                console.error('Can be read ' + filename + ' !');
+                console.log(e);
             }
           }
           FILE_DECL.lastIndex = 0;
